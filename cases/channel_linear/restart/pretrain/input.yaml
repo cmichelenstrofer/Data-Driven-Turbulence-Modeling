@@ -9,7 +9,7 @@ nnodes:  10
 # optimization
 opt_algorithm: Adam
 opt_parameters:
-  learning_rate: 0.001
+  learning_rate: 0.0001
   beta1: 0.9
   beta2: 0.999
   eps: 1.0e-8
@@ -17,7 +17,7 @@ opt_restart:
 opt_steps: 1000
 
 # save dir
-save_dir: results_1_1
+save_dir: results
 
 # training data
 gtruth: [0.0,]

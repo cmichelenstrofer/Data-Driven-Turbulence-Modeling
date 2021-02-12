@@ -21,3 +21,4 @@ polyMesh
 *.pgf
 *.pdf
 
+*.npy
