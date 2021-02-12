@@ -1,15 +1,14 @@
 #!/bin/bash
-""" 
-Load all required packages. I keep this file in my home directory and source it from there:
-    > . .DDTM
-This is a sample and needs to be modified for each system.
- """
+
+# Load all required packages. I keep this file in my home directory and source it from there:
+#     > . .DDTM
+# This is a sample and needs to be modified for each system.
 
 of1912 # source ~/OpenFOAM/OpenFOAM-v1912/etc/bashrc
 conda activate python3 # python 3.8, numpy, scipy, tensorflow 2, matplotlib, pyyaml
 
-export PYTHONPATH="$l/cmich/DDTM/code:l/cmich/DAFI:$PYTHONPATH"
-export PATH="l/cmich/DDTM/code/train:l/cmich/DDTM/code/utilities:$PATH"
+export PYTHONPATH="/l/cmich/DDTM/code/train:/l/cmich/DDTM/code/utilities:/l/cmich/DAFI:$PYTHONPATH"
+export PATH="/l/cmich/DDTM/code/train:/l/cmich/DDTM/code/utilities:$PATH"
 export PYTHONUNBUFFERED=1
 
 export LIBRARY_PATH=$LIBRARY_PATH:/l/cmich/libtf/lib
