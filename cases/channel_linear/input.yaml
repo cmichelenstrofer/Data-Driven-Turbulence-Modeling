@@ -13,7 +13,7 @@ opt_parameters:
   beta2: 0.999
   eps: 1.0e-8
 opt_restart: 0
-opt_steps: 100
+opt_steps: 200
 
 # data-preprocessing
 preproc_class: Scale

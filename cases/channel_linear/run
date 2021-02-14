@@ -1,0 +1,5 @@
+nohup train.py input.yaml > log 2>&1 &
+# echo $! > save_pid.txt
+
+# kill -9 `cat save_pid.txt`
+# rm save_pid.txt

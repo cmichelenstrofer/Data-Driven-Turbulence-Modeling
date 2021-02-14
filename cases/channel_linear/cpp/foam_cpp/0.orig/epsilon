@@ -1,0 +1,51 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      epsilon;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 2 -3 0 0 0 0];
+
+// https://www.cfd-online.com/Wiki/Turbulence_free-stream_boundary_conditions
+// using "pipe" approximation, 1x1 square pipe,
+//    hydraulic diameter: dh = 4*area/perimeter = 1
+//    turbulence length scale , l = 0.07*dh = 0.07
+// epsilon = Cmu^0.75 * k^1.5 / l
+//    Cmu = 0.09
+//    k = 0.00375
+//    epsilon = 0.0005390521017186993
+internalField   uniform 0.000539;
+
+boundaryField
+{
+    top
+    {
+        type            symmetryPlane;
+    }
+    bottom
+    {
+        type            epsilonWallFunction;
+        value           $internalField;
+    }
+    "(inlet|outlet)"
+    {
+        type            cyclic;
+    }
+    defaultFaces
+    {
+        type            empty;
+    }
+}
+
+
+// ************************************************************************* //

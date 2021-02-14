@@ -1,0 +1,14 @@
+
+# architecture
+nscalar_invariants: 1
+nbasis_tensors: 1
+nhlayers:  10
+nnodes:  10
+
+# save dir
+save_dir: foam_cpp/model
+
+# weights
+weights_file: ../results/w.200
+min_file: ../results/input_preproc_stat_0_200
+max_file: ../results/input_preproc_stat_1_200
