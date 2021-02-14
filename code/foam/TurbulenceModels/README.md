@@ -18,7 +18,7 @@ sed -i s/FOAM_LIBBIN/FOAM_USER_LIBBIN/g ./*/Make/files
 Copy each linear turbulence model *myLinearModel* and include it in compile list.
 ```sh
 # copy the new turbulence model
-cp -r $AFRL/code/foam/TurbulenceModels/myLinearModel turbulenceModels/RAS
+cp -r $DDTM/code/foam/TurbulenceModels/myLinearModel turbulenceModels/RAS
 # manually add the new model to the compile list
 # add the following lines to the file 'incompressible/turbulentTransportModels/turbulentTransportModels.C':
       #include "myLinearModel.H"
@@ -32,7 +32,7 @@ List of linear models:
 Copy each non-linear turbulence model *myNonLinearModel* and include it in the compile list.
 ```sh
 # copy the new turbulence models
-cp -r $AFRL/code/foam/TurbulenceModels/myNonLinearModel incompressible/turbulentTransportModels/RAS
+cp -r $DDTM/code/foam/TurbulenceModels/myNonLinearModel incompressible/turbulentTransportModels/RAS
 # manually add the new model to the compile list
 # add the following line to the file 'incompressible/Make/files':
       turbulentTransportModels/RAS/myNonLinearModel/myNonLinearModel.C
