@@ -396,7 +396,7 @@ class CostEnsemble(Cost):
                     if i==j:
                         quant = 1.0 - quant
                     mult[m, n] = (1.0/lenscale**2) * quant
-            cov_bb = np.multiply(cov_bb, mult)
+            cov_bb = np.multiply(cov_bb.toarray(), mult)
             # update covariance 
             cov -= cov_vb @ np.linalg.inv(cov_bb) @ cov_vb.T
         _, klmodes = rf.calc_kl_modes_coverage(cov,
@@ -492,7 +492,7 @@ class CostEnsemble(Cost):
         dJda = np.zeros([self.ncells * DEVSYMTENSORDIM, 1]) 
         for i, imeasurement in enumerate(self.flow['measurements']):
             # Create the observation ensemble and R matrix 
-            if imeasurement['observation_mask_type'] == 'fullfield':
+            if imeasurement['observation_type'] == 'fullfield':
                 H_samp = samps[imeasurement['variable']]
                 H_bl = baseline[imeasurement['variable']]
                 if imeasurement['measurement_stddev'] is None:
@@ -502,7 +502,7 @@ class CostEnsemble(Cost):
                     Rinv = np.diag(self.cell_volumes) / mean_cell_volume 
                 else: 
                     Rinv = np.eye(self.ncells) * imeasurement['measurement_stddev'] 
-            elif imeasurement['observation_mask_type'] == 'point':
+            elif imeasurement['observation_type'] == 'point':
                 # TODO: Use sparse matrix (single matrix) rather than creating an interpolation for every sample at every step.
                 data = samps[imeasurement['variable']]
                 Rinv = np.array([[ 1.0/(imeasurement['measurement_stddev']**2) ]])
