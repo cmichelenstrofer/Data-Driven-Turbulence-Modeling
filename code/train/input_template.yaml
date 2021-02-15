@@ -39,11 +39,11 @@ flow_0: # first training flow. Include on such dictionary per training flow
   # input_scalars: # if fixed_inputs
   # input_tensors: # if fixed_inputs
   # input_tke: # if fixed_inputs
+  start_from_prev: True
+  turb_quant: omega
   gradient_method: adjoint # current methods: 'adjoint', 'ensemble'
   gradient_options: # different inputs for different gradient methods
     ## if adjoint:
-    start_from_prev: True
-    turb_quant: omega
     foam_dir_a: foam_adjoint 
     foam_timedir_a: 10 
     log_dir: results/foamlogs_flow_0 

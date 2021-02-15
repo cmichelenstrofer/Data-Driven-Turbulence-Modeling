@@ -103,6 +103,16 @@ class Cost(object):
             self.iteration = 0
         else:
             self.iteration = restart
+        
+        # start each new RANS solve from previous solution
+        self.start_from_prev = flow.get('start_from_prev', False)
+
+        # copy initial files
+        self.turb_quant = flow.get('turb_quant', '')
+        self.copyfilenames = ['U', 'p', 'k', self.turb_quant, 'nut']
+        for filename in self.copyfilenames:
+            file = os.path.join(self.foam_dir, '0.orig', filename)
+            shutil.copyfile(file+'.orig', file)
 
 
     def _modify_foam_case(self, g, foam_dir=None):
@@ -139,17 +149,7 @@ class CostAdjoint(Cost):
             except:
                 pass
         mkdir(self.logdir_p)
-        mkdir(self.logdir_a)
-
-        # start each new RANS solve from previous solution
-        self.start_from_prev = flow['gradient_options'].get('start_from_prev', False)
-
-        # copy initial files 
-        self.turb_quant = flow['gradient_options']['turb_quant']
-        self.copyfilenames = ['U', 'p', 'k', self.turb_quant, 'nut']
-        for filename in self.copyfilenames:
-            file = os.path.join(self.foam_dir, '0.orig', filename)
-            shutil.copyfile(file+'.orig', file)  
+        mkdir(self.logdir_a) 
 
         # read OpenFOAM fields
         forcing_file = os.path.join(self.foam_dir_a, '0.orig', 'UForcing.orig')
@@ -346,15 +346,15 @@ class CostEnsemble(Cost):
             os.makedirs(self.results_dir)
 
         # create ensemble folders
-        ensemble_dir = '_samples'
+        self.ensemble_dir = '_samples'
         try:
-            shutil.rmtree(ensemble_dir)
+            shutil.rmtree(self.ensemble_dir)
         except:
             pass
-        os.makedirs(ensemble_dir)
+        os.makedirs(self.ensemble_dir)
         sample_dirs = []
         for isample in range(self.nsamples):
-            sample_dir = os.path.join(ensemble_dir, f'sample_{isample}')
+            sample_dir = os.path.join(self.ensemble_dir, f'sample_{isample}')
             sample_dirs.append(sample_dir)
             shutil.copytree(self.foam_dir, sample_dir)
         self.sample_dirs = sample_dirs
@@ -407,7 +407,7 @@ class CostEnsemble(Cost):
                                    normalize = False)
         self.klmodes = klmodes
         self.nmodes = self.klmodes.shape[1]
-        np.savetxt(os.path.join(ensemble_dir, 'klmodes'), self.klmodes)
+        np.savetxt(os.path.join(self.ensemble_dir, 'klmodes'), self.klmodes)
 
         # ensemble gradient
         self.ensemble_gradient = getattr(ensemble, ensemble_method)
@@ -469,6 +469,7 @@ class CostEnsemble(Cost):
             gT = np.expand_dims(g, axis=1) * tensor_basis
             kgT = 2.0 *np.expand_dims(tke, axis=(-1, -2)) * gT 
             Tau_samp[:, isamp] = np.sum(kgT.reshape(-1, self.nbasis), axis=1)
+            _clean_foam(sampledir)
         samps = {'Ux': Ux_samp, 'Uy': Uy_samp, 'Uz': Uz_samp, 'p': p_samp}
 
         # run baseline case
@@ -479,7 +480,18 @@ class CostEnsemble(Cost):
         gradU_bl = rf.foam.read_tensor_field(self.gradU_file)
         tke_bl = rf.foam.read_scalar_field(self.tke_file)
         time_scale_bl = rf.foam.read_scalar_field(self.time_scale_file)
+        
+        # Start from previous baseline solution
+        if self.start_from_prev:
+            for sample_dir in self.sample_dirs:
+                for filename in self.copyfilenames:
+                    src = os.path.join(
+                        self.foam_dir, self.foam_timedir, filename)
+                    dst = os.path.join(sample_dir, '0.orig', filename)
+                    shutil.copyfile(src, dst)
+
         _clean_foam(self.foam_dir)
+        
         baseline = {'Ux': U_bl[:, 0], 'Uy': U_bl[:, 1], 'Uz': U_bl[:, 2], 'p': p_bl}
         _, tensor_basis = get_inputs(gradU_bl, time_scale_bl)
         tensor_basis = tensor_basis[:, :, :self.nbasis]
@@ -526,3 +538,14 @@ class CostEnsemble(Cost):
         cost_vars = {'U': U_bl, 'p':p_bl, 'gradU':gradU_bl, 'tke':tke_bl, 'timeScale':time_scale_bl}
         self.iteration += 1
         return J, dJda, cost_vars
+
+    def clean(self, ):
+        # remove sample directories
+        shutil.rmtree(self.ensemble_dir)
+        # clean baseline flow
+        remove = lambda x : os.remove(os.path.join(self.foam_dir, '0.orig', x))
+        remove('U')
+        remove('p')
+        remove('k')
+        remove(self.turb_quant)
+        remove('nut')

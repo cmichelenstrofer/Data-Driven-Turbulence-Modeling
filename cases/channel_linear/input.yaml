@@ -34,10 +34,10 @@ parallel: False
 flow_0:
   foam_dir: foam_primal
   foam_timedir: 5000
+  start_from_prev: True
+  turb_quant: omega
   gradient_method: adjoint
   gradient_options:
-    start_from_prev: True
-    turb_quant: omega
     foam_dir_a: foam_adjoint 
     foam_timedir_a: 200 
     log_dir: results/foamlogs_flow_0
