@@ -44,7 +44,7 @@ flow_0:
     lenscale: 0.1
     stddev_ratio: 0.35 # 0.05
     stddev_type: norm
-    ensemble_method: precondition # projection, precondition, precondition2
+    ensemble_method: projection # projection, precondition, precondition2
     baseline_as_mean: True
     eps: 1.0e-8
     results_dir: results_ensemble/samples
