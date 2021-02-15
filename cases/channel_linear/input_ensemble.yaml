@@ -52,7 +52,7 @@ flow_0:
 flow_0_measurement_0:
   type: volume
   variable: 'Ux'
-  observation_mask_type: fullfield
+  observation_type: fullfield
   training_data: data/UxFullField
   scaling: 1.0
   measurement_stddev: norm # empty for full field using R = cell volumes, 'norm' for same as empty but normalized by average cell volume 
