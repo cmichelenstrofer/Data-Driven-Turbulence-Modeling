@@ -1,0 +1,58 @@
+# architecture
+nscalar_invariants: 1
+nbasis_tensors: 1
+nhlayers:  10
+nnodes:  10
+
+g_init: [-0.05,]
+
+# optimization
+opt_algorithm: Adam
+opt_parameters:
+  learning_rate: 0.001
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1.0e-8
+opt_restart: 0
+opt_steps: 200
+
+# data-preprocessing
+preproc_class: Scale
+
+# regularization
+regularization:
+reg_coeff:
+
+# debug
+save_gradients: False
+fixed_inputs: False
+
+# save dir
+save_dir: results_ensemble
+
+# training flows and measurements
+nflows: 1
+parallel: False
+flow_0:
+  foam_dir: foam_primal
+  foam_timedir: 1000
+  gradient_method: ensemble
+  neumann_boundaries_coordinates: data/neumann_boundaries
+  gradient_options:
+    ncpu: 20
+    nsamples: 20
+    lenscale: 0.1
+    stddev_ratio: 0.35 # 0.05
+    stddev_type: norm
+    ensemble_method: precondition # projection, precondition, precondition2
+    baseline_as_mean: True
+    eps: 1.0e-8
+    results_dir: results_ensemble/samples
+  nmeasurements: 1
+flow_0_measurement_0:
+  type: volume
+  variable: 'Ux'
+  observation_mask_type: fullfield
+  training_data: data/UxFullField
+  scaling: 1.0
+  measurement_stddev: norm # empty for full field using R = cell volumes, 'norm' for same as empty but normalized by average cell volume 

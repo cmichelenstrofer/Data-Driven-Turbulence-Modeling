@@ -47,6 +47,10 @@ nhlayers = input_dict.get('nhlayers', 10)
 nnodes = input_dict.get('nnodes', 10)
 alpha = input_dict.get('alpha', 0.0)
 
+# Modify the pre-trained network without having to pre-train again
+g_init = np.array(input_dict.get('g_init', [0.0]*nbasis_tensors))
+g_scale = input_dict.get('g_scale', 1.0)
+
 # optimization
 opt_algorithm = input_dict.get('opt_algorithm', 'GradientDescent')
 opt_parameters = input_dict.get('opt_parameters', None)
@@ -200,7 +204,7 @@ def cost(w):
         # evaluate NN: cost and gradient
         ts = time.time()
         with tf.GradientTape(persistent=True) as tape:
-            g = nn(input_scalars_list[iflow])
+            g = nn(input_scalars_list[iflow])*g_scale + g_init
         print(f'      TensorFlow forward ... {time.time()-ts:.2f}s')
         ts = time.time()
         dgdw_list = tape.jacobian(
