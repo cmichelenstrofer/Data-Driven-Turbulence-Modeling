@@ -44,13 +44,13 @@ namespace RASModels
 template<class BasicTurbulenceModel>
 void kOmegaNNLinearTrain<BasicTurbulenceModel>::correctNut()
 {
-    this->timeScale_=1.0/(omega_*Cmu_);
-
-    this->nut_ = -g1_*k_*timeScale_;
+    this->nut_ = -g1_*k_/(omega_*Cmu_);
     this->nut_.correctBoundaryConditions();
     fv::options::New(this->mesh_).correct(this->nut_);
 
     BasicTurbulenceModel::correctNut();
+
+    this->timeScale_=1.0/(omega_*Cmu_);
 }
 
 

@@ -47,14 +47,12 @@ void NoOpDeallocator(void* data, size_t a, void* b) {}
 template<class BasicTurbulenceModel>
 void kOmegaNNLinear<BasicTurbulenceModel>::correctNut()
 {
-    // update time scale
-    this->timeScale_=1.0/(omega_*Cmu_);
     // problem dimensions 
     int nCells = this->mesh_.nCells();
     int nScalarInvariants = 1;
     // update theta1_
     volTensorField gradU(fvc::grad(this->U_));
-    volSymmTensorField S(timeScale_*symm(gradU));
+    volSymmTensorField S(symm(gradU)*timeScale_);
     volScalarField th1(tr(S&S));
     for(int i=0;i<nCells;i++)
     {
@@ -67,10 +65,12 @@ void kOmegaNNLinear<BasicTurbulenceModel>::correctNut()
         g1_[i] = g1nn[i];
     }
     // linear eddy viscosity model
-    this->nut_ = -g1_*k_*timeScale_;
+    this->nut_ = -g1_*k_/(omega_*Cmu_);
     this->nut_.correctBoundaryConditions();
     fv::options::New(this->mesh_).correct(this->nut_);
     BasicTurbulenceModel::correctNut();
+    // update time scale
+    this->timeScale_=1.0/(omega_*Cmu_);
 }
 
 
