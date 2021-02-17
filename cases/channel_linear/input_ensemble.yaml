@@ -14,7 +14,7 @@ opt_parameters:
   beta2: 0.999
   eps: 1.0e-8
 opt_restart: 0
-opt_steps: 200
+opt_steps: 250
 
 # data-preprocessing
 preproc_class: Scale
@@ -28,14 +28,16 @@ save_gradients: False
 fixed_inputs: False
 
 # save dir
-save_dir: results_ensemble
+save_dir: results
 
 # training flows and measurements
 nflows: 1
 parallel: False
 flow_0:
-  foam_dir: foam_ensemble
+  foam_dir: foam_primal
   foam_timedir: 5000
+  start_from_prev: True
+  turb_quant: omega
   gradient_method: ensemble
   neumann_boundaries_coordinates: data/neumann_boundaries
   gradient_options:
@@ -47,7 +49,7 @@ flow_0:
     ensemble_method: projection # projection, precondition, precondition2
     baseline_as_mean: True
     eps: 1.0e-8
-    results_dir: results_ensemble/samples
+    results_dir: results/samples
   nmeasurements: 1
 flow_0_measurement_0:
   type: volume
