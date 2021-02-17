@@ -376,11 +376,19 @@ class CostEnsemble(Cost):
             for idim in range(VECTORDIM):
                 dx= np.subtract.outer(self.coordinates[:, idim], coordinates_b[:, idim])
                 exp += (dx / lenscale)**2
-            cov_vb = np.exp(-0.5*exp)
-            idir = int(coordinates_b[:, 3])
-            dir_coord_v = self.coordinates[:, idir]
-            dir_coord_b = coordinates_b[:, idir]
-            cov_vb = np.multiply(cov_vb, (1.0/lenscale**2) * np.subtract.outer(dir_coord_v, dir_coord_b))
+            sqrexp = np.exp(-0.5*exp)
+            # cov_vb = np.exp(-0.5*exp)
+            # idir = int(coordinates_b[:, 3]) # TODO
+            # dir_coord_v = self.coordinates[:, idir]
+            # dir_coord_b = coordinates_b[:, idir]
+            # cov_vb = np.multiply(cov_vb, (1.0/lenscale**2) * np.subtract.outer(dir_coord_v, dir_coord_b))
+            diff = np.zeros([self.ncells, nb])
+            for m in range(self.ncells):
+                for n in range(nb):
+                    i = int(coordinates_b[n, 3])
+                    diff[m, n] = (coordinates_b[n, i] - coordinates_b[m, i])
+            cov_vb = (1.0/lenscale**2) * np.multiply(sqrexp, diff)
+
             # boundary-boundary covariance 
             cov_bb =  rf.covariance.generate_cov(kernel = 'sqrexp', 
                                                  stddev = 1.0,
@@ -392,11 +400,12 @@ class CostEnsemble(Cost):
                 i = int(coordinates_b[m, 3])
                 for n in range(nb):
                     j = int(coordinates_b[n, 3])
-                    quant = (1.0/lenscale**2) * (coordinates_b[m, i] - coordinates_b[n, i]) * (coordinates_b[m, j] - coordinates_b[n, j])
+                    quant = -(1.0/lenscale**2) * (coordinates_b[m, i] - coordinates_b[n, i]) * (coordinates_b[m, j] - coordinates_b[n, j])
                     if i==j:
-                        quant = 1.0 - quant
+                        quant += 1.0 
                     mult[m, n] = (1.0/lenscale**2) * quant
-            cov_bb = np.multiply(cov_bb.toarray(), mult)
+            # cov_bb = np.multiply(cov_bb.toarray(), mult) # TODO
+            cov_bb = np.multiply(mult, cov_bb.toarray()) # TODO
             # update covariance 
             cov -= cov_vb @ np.linalg.inv(cov_bb) @ cov_vb.T
         _, klmodes = rf.calc_kl_modes_coverage(cov,
