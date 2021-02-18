@@ -340,6 +340,7 @@ class CostEnsemble(Cost):
         self.results_dir = flow['gradient_options']['results_dir'] 
         self.stddev_type = flow['gradient_options']['stddev_type']
         self.neumann_boundaries_coordinates = flow['neumann_boundaries_coordinates']
+        self.inv_perturb = flow.get('inv_perturb', 0.0)
 
         # results folder
         if not os.path.exists(self.results_dir):
@@ -377,16 +378,11 @@ class CostEnsemble(Cost):
                 dx= np.subtract.outer(self.coordinates[:, idim], coordinates_b[:, idim])
                 exp += (dx / lenscale)**2
             sqrexp = np.exp(-0.5*exp)
-            # cov_vb = np.exp(-0.5*exp)
-            # idir = int(coordinates_b[:, 3]) # TODO
-            # dir_coord_v = self.coordinates[:, idir]
-            # dir_coord_b = coordinates_b[:, idir]
-            # cov_vb = np.multiply(cov_vb, (1.0/lenscale**2) * np.subtract.outer(dir_coord_v, dir_coord_b))
             diff = np.zeros([self.ncells, nb])
             for m in range(self.ncells):
                 for n in range(nb):
                     i = int(coordinates_b[n, 3])
-                    diff[m, n] = (coordinates_b[n, i] - coordinates_b[m, i])
+                    diff[m, n] = (coordinates_b[n, i] - self.coordinates[m, i])
             cov_vb = (1.0/lenscale**2) * np.multiply(sqrexp, diff)
 
             # boundary-boundary covariance 
@@ -404,10 +400,9 @@ class CostEnsemble(Cost):
                     if i==j:
                         quant += 1.0 
                     mult[m, n] = (1.0/lenscale**2) * quant
-            # cov_bb = np.multiply(cov_bb.toarray(), mult) # TODO
-            cov_bb = np.multiply(mult, cov_bb.toarray()) # TODO
-            # update covariance 
-            cov -= cov_vb @ np.linalg.inv(cov_bb) @ cov_vb.T
+            cov_bb = np.multiply(mult, cov_bb.toarray()) 
+            # update covariance
+            cov -= cov_vb @ np.linalg.inv(cov_bb+np.eye(nb)*self.inv_perturb) @ cov_vb.T
         _, klmodes = rf.calc_kl_modes_coverage(cov,
                                    coverage = coverage,
                                    weight_field = self.cell_volumes,
@@ -416,7 +411,7 @@ class CostEnsemble(Cost):
                                    normalize = False)
         self.klmodes = klmodes
         self.nmodes = self.klmodes.shape[1]
-        np.savetxt(os.path.join(self.ensemble_dir, 'klmodes'), self.klmodes)
+        np.savetxt(os.path.join(self.results_dir, 'klmodes'), self.klmodes)
 
         # ensemble gradient
         self.ensemble_gradient = getattr(ensemble, ensemble_method)

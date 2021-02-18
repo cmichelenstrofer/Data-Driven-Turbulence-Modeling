@@ -28,7 +28,7 @@ save_gradients: False
 fixed_inputs: False
 
 # save dir
-save_dir: results
+save_dir: results_ensemble
 
 # training flows and measurements
 nflows: 1
@@ -49,7 +49,7 @@ flow_0:
     ensemble_method: projection # projection, precondition, precondition2
     baseline_as_mean: True
     eps: 1.0e-8
-    results_dir: results/samples
+    results_dir: results_ensemble/samples
   nmeasurements: 1
 flow_0_measurement_0:
   type: volume
