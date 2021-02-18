@@ -1,0 +1,76 @@
+# architecture
+nscalar_invariants: 2
+nbasis_tensors: 4
+nhlayers:  10
+nnodes:  10
+
+g_init: [0.0, 0.0, 0.0, 0.0]
+g_scale: [1.0, 0.01, 0.01, 0.01]
+
+# optimization
+opt_algorithm: Adam
+opt_parameters:
+  learning_rate: 0.001
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1.0e-8
+opt_restart: 0
+opt_steps: 100
+
+# data-preprocessing
+preproc_class: Scale
+
+# regularization
+regularization:
+reg_coeff:
+
+# debug
+save_gradients: False
+fixed_inputs: False
+
+# save dir
+save_dir: results_ensemble
+
+# training flows and measurements
+nflows: 1
+parallel: False
+flow_0:
+  foam_dir: foam_primal
+  foam_timedir: 10000
+  start_from_prev: True
+  turb_quant: epsilon
+  gradient_method: ensemble
+  neumann_boundaries_coordinates: data/neumann_boundaries
+  inv_perturb: 1.0e-5
+  gradient_options:
+    ncpu: 20
+    nsamples: 20
+    lenscale: 0.1
+    stddev_ratio: 0.05 
+    stddev_type: norm
+    ensemble_method: projection # projection, precondition, precondition2
+    baseline_as_mean: True
+    eps: 1.0e-8
+    results_dir: results_ensemble/samples
+  nmeasurements: 3
+flow_0_measurement_0:
+  type: volume
+  variable: 'Ux'
+  observation_type: fullfield
+  training_data: data/UxFullField
+  scaling: 0.5 # domain is symmetric. Only want half domain. 
+  measurement_stddev: norm # empty for full field using R = cell volumes, 'norm' for same as empty but normalized by average cell volume
+flow_0_measurement_1:
+  type: volume
+  variable: 'Uy'
+  observation_type: fullfield
+  training_data: data/UyFullField
+  scaling: 500.0
+  measurement_stddev: norm # empty for full field using R = cell volumes, 'norm' for same as empty but normalized by average cell volume
+flow_0_measurement_2:
+  type: volume
+  variable: 'Uz'
+  observation_type: fullfield
+  training_data: data/UzFullField
+  scaling: 500.0
+  measurement_stddev: norm # empty for full field using R = cell volumes, 'norm' for same as empty but normalized by average cell volume

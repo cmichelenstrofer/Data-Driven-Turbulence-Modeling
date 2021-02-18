@@ -1,0 +1,66 @@
+
+# architecture
+nscalar_invariants: 2
+nbasis_tensors: 4
+nhlayers:  10
+nnodes:  10
+
+g_init: [0.0, 0.0, 0.0, 0.0]
+g_scale: [1.0, 0.01, 0.01, 0.01]
+
+# optimization
+opt_algorithm: Adam
+opt_parameters:
+  learning_rate: 0.001
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1.0e-8
+opt_restart: 0
+opt_steps: 100
+
+# data-preprocessing
+preproc_class: Scale
+
+# regularization
+regularization:
+reg_coeff:
+
+# debug
+save_gradients: False
+fixed_inputs: False
+
+# save dir
+save_dir: results
+
+# training flows and measurements
+nflows: 1
+parallel: False
+flow_0:
+  foam_dir: foam_primal
+  foam_timedir: 10000
+  start_from_prev: True
+  turb_quant: epsilon
+  gradient_method: adjoint
+  gradient_options:
+    foam_dir_a: foam_adjoint 
+    foam_timedir_a: 40000 
+    log_dir: results/foamlogs_flow_0
+  nmeasurements: 3
+flow_0_measurement_0:
+  type: volume
+  variable: 'Ux'
+  observation_type: fullfield
+  training_data: data/UxFullField
+  scaling: 0.5 # domain is symmetric. Only want half domain. 
+flow_0_measurement_1:
+  type: volume
+  variable: 'Uy'
+  observation_type: fullfield
+  training_data: data/UyFullField
+  scaling: 500.0
+flow_0_measurement_2:
+  type: volume
+  variable: 'Uz'
+  observation_type: fullfield
+  training_data: data/UzFullField
+  scaling: 500.0
