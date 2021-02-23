@@ -1,0 +1,26 @@
+
+# architecture
+nscalar_invariants: 2
+nbasis_tensors: 2
+nhlayers:  10
+nnodes:  10
+
+
+# optimization
+opt_algorithm: Adam
+opt_parameters:
+  learning_rate: 0.001
+  beta1: 0.9
+  beta2: 0.999
+  eps: 1.0e-8
+opt_restart:  
+opt_steps: 10000
+
+# save dir
+save_dir: results
+
+# training data
+gtruth: [-0.09, 0.001]
+amplitude: 0.001
+ndata: 100
+data_lim: [-1.0, 2.0]

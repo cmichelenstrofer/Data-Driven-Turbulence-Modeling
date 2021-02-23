@@ -1,0 +1,10 @@
+#!/bin/sh
+
+cd ${0%/*} || exit 1
+. $WM_PROJECT_DIR/bin/tools/CleanFunctions
+
+cleanCase0
+rm -f 0.orig/g1 0.orig/g2 0.orig/g3 0.orig/g4
+rm -rf logs residuals.png
+
+#------------------------------------------------------------------------------
